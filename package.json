@@ -1,0 +1,17 @@
+{
+  "name": "product-dev-consulting",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "lerna run build",
+    "start": "lerna run start",
+    "lint": "lerna run lint",
+    "test": "lerna run test"
+  },
+  "devDependencies": {
+    "lerna": "^8.1.9",
+    "typescript": "^5.1.6"
+  }
+}

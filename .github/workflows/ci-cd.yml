@@ -1,0 +1,104 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build
+        run: yarn build
+
+      - name: Test
+        run: yarn test
+
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          install_components: 'beta'
+
+      # Deploy each agent to Cloud Run
+      - name: Deploy client-communication-agent to Cloud Run
+        run: |
+          gcloud run deploy client-communication-agent             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/client-communication-agent:latest             --platform managed             --region ${{ secrets.GCP_REGION }}             --allow-unauthenticated
+
+      - name: Deploy project-management-agent to Cloud Run
+        run: |
+          gcloud run deploy project-management-agent             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/project-management-agent:latest             --platform managed             --region ${{ secrets.GCP_REGION }}             --allow-unauthenticated
+
+      - name: Deploy development-agent to Cloud Run
+        run: |
+          gcloud run deploy development-agent             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/development-agent:latest             --platform managed             --region ${{ secrets.GCP_REGION }}             --allow-unauthenticated
+
+      - name: Deploy testing-agent to Cloud Run
+        run: |
+          gcloud run deploy testing-agent             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/testing-agent:latest             --platform managed             --region ${{ secrets.GCP_REGION }}             --allow-unauthenticated
+
+      - name: Deploy deployment-agent to Cloud Run
+        run: |
+          gcloud run deploy deployment-agent             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/deployment-agent:latest             --platform managed             --region ${{ secrets.GCP_REGION }}             --allow-unauthenticated
+
+      - name: Deploy internal-communication-agent to Cloud Run
+        run: |
+          gcloud run deploy internal-communication-agent             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/internal-communication-agent:latest             --platform managed             --region ${{ secrets.GCP_REGION }}             --allow-unauthenticated
+
+      - name: Deploy documentation-agent to Cloud Run
+        run: |
+          gcloud run deploy documentation-agent             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/documentation-agent:latest             --platform managed             --region ${{ secrets.GCP_REGION }}             --allow-unauthenticated
+
+      - name: Deploy support-agent to Cloud Run
+        run: |
+          gcloud run deploy support-agent             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/support-agent:latest             --platform managed             --region ${{ secrets.GCP_REGION }}             --allow-unauthenticated
+
+      - name: Deploy self-improvement-agent to Cloud Run
+        run: |
+          gcloud run deploy self-improvement-agent             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/self-improvement-agent:latest             --platform managed             --region ${{ secrets.GCP_REGION }}             --allow-unauthenticated
+
+      - name: Deploy client-portal to Cloud Run
+        run: |
+          gcloud run deploy client-portal             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/client-portal:latest             --platform managed             --region ${{ secrets.GCP_REGION }}             --allow-unauthenticated

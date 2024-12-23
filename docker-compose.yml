@@ -1,0 +1,145 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14
+    container_name: product_dev_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Message Queue
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    restart: unless-stopped
+
+  # Agents
+  client-communication-agent:
+    build: ./packages/client-communication-agent
+    container_name: client-communication-agent
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  project-management-agent:
+    build: ./packages/project-management-agent
+    container_name: project-management-agent
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  development-agent:
+    build: ./packages/development-agent
+    container_name: development-agent
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  testing-agent:
+    build: ./packages/testing-agent
+    container_name: testing-agent
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  deployment-agent:
+    build: ./packages/deployment-agent
+    container_name: deployment-agent
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  internal-communication-agent:
+    build: ./packages/internal-communication-agent
+    container_name: internal-communication-agent
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  documentation-agent:
+    build: ./packages/documentation-agent
+    container_name: documentation-agent
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  support-agent:
+    build: ./packages/support-agent
+    container_name: support-agent
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  self-improvement-agent:
+    build: ./packages/self-improvement-agent
+    container_name: self-improvement-agent
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  # Client Portal (Optional: Implement as needed)
+  client-portal:
+    build: ./packages/client-portal
+    container_name: client-portal
+    depends_on:
+      - db
+      - rabbitmq
+    env_file:
+      - .env
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+
+  # Datadog
+  datadog:
+    image: gcr.io/datadoghq/agent:latest
+    container_name: datadog-agent
+    environment:
+      DD_API_KEY: ${DATADOG_API_KEY}
+      DD_SITE: ${DATADOG_SITE}
+      DD_SERVICE: ${DATADOG_SERVICE}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  db_data:

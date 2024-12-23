@@ -1,0 +1,75 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Runtime Files
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Compiled Output
+dist/
+build/
+out/
+
+# Coverage Directory
+coverage/
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+/.nyc_output
+/.coverage
+/.cache
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*~
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Debug
+debug/
+*.log
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Firebase
+firebase-debug.log
+.firebase/
+
+# Datadog
+datadog.yaml
+
+git-filter-repo
+product-dev-consulting-key.json
